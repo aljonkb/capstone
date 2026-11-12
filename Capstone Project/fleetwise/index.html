@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#123b70" />
+    <title>Fleetwise | Fleet management</title>
+    
+    
+    
+  <link rel="stylesheet" href="styles.css"></head>
+  <body>
+    <!-- Login screen: the app stays hidden until a demo account is accepted. -->
+    <section id="loginScreen" class="login-screen">
+      <div class="login-brand">
+        <div class="login-logo">
+          <span class="brandmark"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 16.5 6.8 8h10.4l2.8 8.5M3 16.5h18M6 16.5v2m12-2v2M7 11h10"
+              />
+              <circle cx="7.5" cy="16.5" r="1.5" />
+              <circle cx="16.5" cy="16.5" r="1.5" /></svg></span
+          >Fleetwise
+        </div>
+        <h1>Fleet operations,<br />all in one place.</h1>
+        <p>
+          Track vehicles, maintenance, repair costs, and replacement needs
+          across your stations.
+        </p>
+      </div>
+      <div class="login-aside">
+        <form id="loginForm" class="login-card">
+          <div class="eyebrow">Fleet management portal</div>
+          <h2>Welcome back</h2>
+          <p>Sign in to continue to your fleet workspace.</p>
+          <div class="login-tabs">
+            <button
+              class="login-tab active"
+              type="button"
+              data-login-role="admin"
+            >
+              Administrator</button
+            ><button class="login-tab" type="button" data-login-role="station">
+              Station
+            </button>
+          </div>
+          <div class="login-fields">
+            <label
+              >Username<input
+                id="loginUsername"
+                autocomplete="username"
+                required
+                placeholder="Enter your username" /></label
+            ><label
+              >Password<input
+                id="loginPassword"
+                type="password"
+                autocomplete="current-password"
+                required
+                placeholder="Enter your password" /></label
+            ><label id="stationField" class="hidden"
+              >Station<select id="loginStation">
+                <option value="Central Office">Central Office</option>
+                <option value="Station 01">Station 01</option>
+                <option value="Station 02">Station 02</option>
+                <option value="Station 03">Station 03</option>
+                <option value="Station 04">Station 04</option>
+              </select></label
+            >
+          </div>
+          <div id="loginError" class="login-error"></div>
+          <button class="btn primary login-submit">Sign in</button>
+          <!-- These shortcuts fill known demo credentials to avoid typing mistakes. -->
+          <div class="demo-shortcuts">
+            <button type="button" data-demo-login="admin">Fill admin demo</button>
+            <button type="button" data-demo-login="station01">Fill Station 01 demo</button>
+          </div>
+          <div class="login-hint">
+            <b>Prototype sign in:</b> administrator
+            <code>admin / admin123</code>; station username is the station name
+            without spaces (for example <code>station01</code>), password
+            <code>station123</code>. Choose the matching station.
+            Production access must use server-side accounts and permissions.
+          </div>
+        </form>
+      </div>
+    </section>
+    <!-- Main fleet app: hidden by JavaScript until login succeeds. -->
+    <div id="appShell" class="shell hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brandmark">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 16.5 6.8 8h10.4l2.8 8.5M3 16.5h18M6 16.5v2m12-2v2M7 11h10M5 7l1-2h12l1 2"
+              />
+              <circle cx="7.5" cy="16.5" r="1.5" />
+              <circle cx="16.5" cy="16.5" r="1.5" />
+            </svg>
+          </div>
+          <div><strong>Fleetwise</strong><small>Fleet management</small></div>
+        </div>
+        <nav class="workspace-nav-links" aria-label="Workspace">
+        <div class="nav-label">Workspace</div>
+        <button class="nav-item active" data-nav="dashboard">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="3" width="8" height="8" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="11" width="7" height="10" rx="1.5" />
+            <rect x="3" y="14" width="8" height="7" rx="1.5" /></svg
+          ><span>Dashboard</span></button
+        ><button class="nav-item" data-nav="vehicles">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="m4 16 2-7h12l2 7M3 16h18M6 16v2m12-2v2M7 12h10" />
+            <circle cx="7" cy="16" r="1.5" />
+            <circle cx="17" cy="16" r="1.5" /></svg
+          ><span id="fleetNavLabel">Fleet inventory</span></button
+        ><button class="nav-item station-only" data-nav="report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3.5h7l4 4V20H7z"/><path d="M14 3.5V8h4M12 11v6m-3-3h6"/></svg><span>Create report</span></button
+        ><button class="nav-item station-only" data-nav="reportHistory">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h5M8 16h4"/><path d="M3 7V4h3"/></svg><span>Report history</span></button
+        ><button class="nav-item" data-nav="repairs">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path
+              d="M14.5 6.5a5 5 0 0 0-6.6 6.6L3 18l3 3 4.9-4.9a5 5 0 0 0 6.6-6.6L14 13l-3-3z"
+            /></svg
+          ><span>Repairs & maintenance</span><span id="maintenanceScheduleBadge" class="nav-badge">0</span></button
+        ><button class="nav-item" data-nav="planning">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M16 2v4M8 2v4M3 9h18M8 13h3m-3 4h8" /></svg
+          ><span>Replacement planning</span
+          ><span id="planBadge" class="nav-badge">0</span>
+        </button>
+        <button class="nav-item admin-only" data-nav="stations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M8 9h.01M12 9h.01M16 9h.01M8 12h.01M12 12h.01M16 12h.01"/></svg><span>Stations &amp; reports</span></button>
+        <button class="nav-item station-only" data-nav="feedback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span>Notifications</span></button>
+        </nav>
+        <div class="workspace-account-actions">
+          <button class="icon-btn" id="alertsBtn" title="Notifications" aria-label="Notifications">
+            <span class="ping hidden" id="notificationPing"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+            </svg>
+          </button>
+          <div class="profile-menu" id="profileMenu">
+            <button class="profile-menu-toggle" id="profileMenuToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenuPanel">
+              <span class="avatar" id="profileAvatar">AD</span>
+              <span class="profile-menu-identity">
+                <b id="profileName">Fleet Administrator</b>
+                <small id="profileRole">Administrator</small>
+              </span>
+              <svg class="profile-menu-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <div class="profile-menu-panel" id="profileMenuPanel" role="menu" hidden>
+              <button class="profile-menu-item admin-only" id="settingsBtn" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.6-1.4-2.4L5.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.7-1L9 7.3h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.6 1.4 2.4-1.4 1.1a8 8 0 0 1-.1 2z" transform="translate(0 -1)" />
+                </svg>
+                <span>Settings</span>
+              </button>
+              <button class="profile-menu-item signout-item" id="logoutBtn" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path d="M10 4H5v16h5M14 8l4 4-4 4m4-4H9" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Sign out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <div class="crumb">
+            Fleet operations&nbsp; / &nbsp;<b id="crumbPage">Overview</b>
+          </div>
+          <div class="live"><span class="dot"></span> Changes saved here</div>
+        </header>
+        <div class="content">
+          <div class="heading">
+            <div>
+              <div class="eyebrow">Transport & equipment administration</div>
+              <h1 id="pageTitle">Fleet overview</h1>
+              <p id="pageDesc">
+                A clear view of your fleet's readiness, costs, and replacement
+                needs.
+              </p>
+            </div>
+            <button class="btn primary admin-only" id="addVehicleBtn">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 5v14M5 12h14" /></svg
+              >Add vehicle
+            </button>
+          </div>
+          <section class="metric-grid">
+            <article class="metric">
+              <div class="metric-head">
+                Registered vehicles
+                <span class="metric-icon"
+                  ><svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path d="m4 16 2-7h12l2 7M3 16h18M6 16v2m12-2v2" />
+                    <circle cx="7" cy="16" r="1.5" />
+                    <circle cx="17" cy="16" r="1.5" /></svg
+                ></span>
+              </div>
+              <div id="vehCount" class="metric-number">0</div>
+              <div class="metric-foot">Active asset records</div>
+            </article>
+            <article class="metric">
+              <div class="metric-head">
+                Registered motorcycles
+                <span class="metric-icon"
+                  ><svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <circle cx="6" cy="17" r="3" />
+                    <circle cx="18" cy="17" r="3" />
+                    <path d="m6 17 4-7h4l4 7m-8-7-2-3H5m5 3 3 3h5" /></svg
+                ></span>
+              </div>
+              <div id="motoCount" class="metric-number">0</div>
+              <div class="metric-foot">Active asset records</div>
+            </article>
+            <article class="metric">
+              <div class="metric-head">
+                Repair spend this year
+                <span class="metric-icon"
+                  ><svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      d="M12 2v20m5-15c0-2-2-3-5-3S7 5 7 7s2 3 5 4 5 2 5 4-2 4-5 4-5-1-5-4"
+                    /></svg
+                ></span>
+              </div>
+              <div id="spendCount" class="metric-number">₱0</div>
+              <div class="metric-foot">
+                Current calendar year · logged repairs
+              </div>
+            </article>
+            <article class="metric">
+              <div class="metric-head">
+                Replacement watchlist
+                <span
+                  class="metric-icon"
+                  style="background: #fff3df; color: #a45b0a"
+                  ><svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path d="M12 3 2.8 19h18.4L12 3zM12 9v4m0 3h.01" /></svg
+                ></span>
+              </div>
+              <div id="watchCount" class="metric-number">0</div>
+              <div class="metric-foot">
+                <span class="warn">Based on age & repair spend</span>
+              </div>
+            </article>
+          </section>
+          <section class="overview">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Fleet register</div>
+                  <div class="panel-sub">
+                    Counts update from vehicles entered in the fleet inventory
+                  </div>
+                </div>
+                <span class="tag neutral">Live register</span>
+              </div>
+              <div class="allocation">
+                <div class="alloc-row">
+                  <div class="alloc-label">Vehicles</div>
+                  <div class="progress"><span id="vehicleMixBar" style="width: 0%"></span></div>
+                  <div class="alloc-val" id="vehicleRegisterCount"><b>0</b> registered</div>
+                </div>
+                <div class="alloc-row">
+                  <div class="alloc-label">Motorcycles</div>
+                  <div class="progress orange">
+                    <span id="motorcycleMixBar" style="width: 0%"></span>
+                  </div>
+                  <div class="alloc-val" id="motorcycleRegisterCount"><b>0</b> registered</div>
+                </div>
+                <div class="alloc-foot">
+                  <span id="registerSummaryNote">No fleet records have been entered yet.</span>
+                </div>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Needs attention</div>
+                  <div class="panel-sub">
+                    Repair spend and useful life alerts
+                  </div>
+                </div>
+                <button class="small-link" data-nav="planning">
+                  View planning →
+                </button>
+              </div>
+              <div class="alert-list" id="alertList"></div>
+            </article>
+          </section>
+          <!-- Admin station report: station summaries, vehicles and repair reports. -->
+          <section id="stationsPanel" class="panel hidden role-panel">
+            <div class="panel-head"><div><div class="panel-title">Stations, vehicles &amp; reports</div><div class="panel-sub">Fleet assignments and repair reports grouped by station</div></div></div>
+            <div class="station-manager admin-only">
+              <h3>Manage stations / offices</h3>
+              <form id="stationForm" class="station-add-form"><input id="newStationName" required maxlength="60" placeholder="Enter station or office name"><button class="btn primary">＋ Add station</button></form>
+              <div id="stationManagerList" class="station-manager-list"></div>
+            </div>
+            <div id="stationReportList" class="role-panel-body"></div>
+            <div class="feedback-compose admin-only">
+              <h3>Send feedback to a station</h3>
+              <form id="feedbackForm" class="feedback-form"><select id="feedbackStation" required aria-label="Choose station"></select><textarea id="feedbackMessage" required placeholder="Write feedback for this station…"></textarea><button class="btn primary">Send feedback</button></form>
+            </div>
+            <div class="report-builder admin-only">
+              <h3>Automated report drafts</h3>
+              <p>Drafts are generated from repair and fleet records saved in this browser. Review before official use; connecting an AI service can improve narrative analysis.</p>
+              <div class="report-controls"><label>Report month<input id="reportMonth" type="month"></label><label>Station<select id="reportTargetStation"></select></label><button id="makeMonthlyReport" class="btn secondary">Generate monthly report</button><button id="makeStationReport" class="btn primary">Generate station summary</button></div>
+              <div id="generatedReports" class="generated-reports"></div>
+            </div>
+          </section>
+          <!-- Admin-only page opened when a station is selected. -->
+          <section id="stationDetailsPanel" class="panel hidden admin-only role-panel">
+            <div class="station-details-header">
+              <button type="button" class="btn secondary" onclick="nav('stations')">← Back to stations</button>
+              <div class="station-details-heading"><div class="panel-title" id="stationDetailsTitle">Station details</div><div class="panel-sub" id="stationDetailsSummary"></div></div>
+              <div id="stationDetailsRequestAction"></div>
+            </div>
+            <div class="station-details-content">
+              <section class="station-detail-section"><h3>Assigned vehicles</h3><div id="stationDetailsVehicles"></div></section>
+              <section class="station-detail-section"><h3>Messages to this station</h3><div id="stationDetailsMessages"></div></section>
+              <section class="station-detail-section"><div class="station-repair-history-head"><h3>Repair history</h3><label>Vehicle<select id="stationDetailsRepairVehicleFilter" aria-label="Filter repair history by vehicle"><option value="">All station vehicles</option></select></label></div><div id="stationDetailsRepairs"></div></section>
+            </div>
+          </section>
+          <!-- Admin notification center for station reports and unread messages. -->
+          <section id="adminNotificationsPanel" class="panel hidden admin-only role-panel">
+            <div class="panel-head"><div><div class="panel-title">Notifications</div><div class="panel-sub">New station reports and messages not yet read by their station</div></div></div>
+            <div id="adminNotificationsList" class="role-panel-body"></div>
+          </section>
+          <!-- Station-only panel: notifications authored by fleet administrators. -->
+          <section id="feedbackPanel" class="panel hidden role-panel station-only">
+            <div class="panel-head"><div><div class="panel-title">Notifications from fleet administration</div><div class="panel-sub">Report requests, feedback, and guidance for your station</div></div></div>
+            <div id="stationFeedbackList" class="role-panel-body"></div>
+          </section>
+          <!-- Station view follows the mobile reference: overdue alert, quick report, filters, car cards. -->
+          <section id="stationCarsPanel" class="panel hidden station-only">
+            <div class="panel-head"><div><div class="panel-title">My station vehicles</div><div class="panel-sub">Maintenance status and latest report for your assigned cars</div></div></div>
+            <div id="stationOverdueNotice" class="overdue-notice"></div>
+            <div class="station-car-tools"><input id="stationCarSearch" placeholder="Search plate or model…"><div class="station-filters"><button class="station-filter active" data-car-filter="all">All</button><button class="station-filter" data-car-filter="overdue">Overdue</button><button class="station-filter" data-car-filter="repair">Under repair</button></div></div>
+            <div id="stationCarList" class="station-car-list"></div>
+          </section>
+          <section id="stationCreatePanel" class="panel hidden station-only">
+            <div class="panel-head"><div><div class="panel-title">Create maintenance report</div><div class="panel-sub">Submit a repair or maintenance report for one of your station vehicles</div></div></div>
+            <div id="stationReportRequests" class="station-request-list hidden"></div>
+            <div class="station-report-start"><label for="reportCarSelect">Car</label><select id="reportCarSelect"></select><button id="startMaintenanceReport" class="btn primary">＋ Start report</button></div>
+          </section>
+          <section id="stationHistoryPanel" class="panel hidden role-panel station-only">
+            <div class="panel-head"><div><div class="panel-title">Report history</div><div class="panel-sub" id="stationHistorySummary"></div></div></div>
+            <div id="stationReportHistory" class="role-panel-body"></div>
+          </section>
+          <!-- Recurring preventive maintenance intervals shared by admins and station staff. -->
+          <section id="maintenanceSchedulePanel" class="panel hidden role-panel maintenance-schedule-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Preventive maintenance schedule</div>
+                <div class="panel-sub">See upcoming service, overdue items, and completed work for assigned vehicles</div>
+              </div>
+              <span id="maintenanceScheduleSummary" class="tag neutral">0 schedules</span>
+            </div>
+            <form id="maintenanceScheduleForm" class="schedule-create admin-only">
+              <h3>Create service interval</h3>
+              <div class="schedule-form-grid">
+                <label>Station<select id="scheduleStation" required><option value="">Choose a station</option></select></label>
+                <label>Vehicle<select id="scheduleVehicle" required disabled><option value="">Choose a station first</option></select></label>
+                <label>Service item<input id="scheduleServiceName" required maxlength="80" placeholder="e.g. Oil and filter change"></label>
+                <label>Interval based on<select id="scheduleIntervalType"><option value="date">Date</option><option value="odometer">Odometer</option></select></label>
+                <div id="scheduleDateFields" class="schedule-interval-fields">
+                  <label>Next due date<input id="scheduleNextDueDate" type="date" required></label>
+                  <label>Repeat every (days)<input id="scheduleIntervalDays" type="number" min="1" step="1" required placeholder="e.g. 180"></label>
+                </div>
+                <div id="scheduleOdometerFields" class="schedule-interval-fields hidden">
+                  <label>Next due odometer (km)<input id="scheduleNextDueOdometer" type="number" min="0" step="1" placeholder="e.g. 10000"></label>
+                  <label>Repeat every (km)<input id="scheduleIntervalKm" type="number" min="1" step="1" placeholder="e.g. 5000"></label>
+                </div>
+              </div>
+              <div class="schedule-create-actions"><small id="scheduleFormHint">Stations can view the schedule and record completed service for their vehicles.</small><div><button type="button" id="cancelScheduleEdit" class="btn secondary hidden">Cancel edit</button><button type="submit" id="maintenanceScheduleSubmit" class="btn primary">＋ Add schedule</button></div></div>
+            </form>
+            <div class="schedule-list-section">
+              <div class="schedule-filter-bar" role="group" aria-label="Filter maintenance schedules">
+                <label class="schedule-station-filter-label">Station<select id="maintenanceScheduleStationFilter" aria-label="Filter schedules by station"></select></label>
+                <label class="schedule-station-filter-label">Vehicle<select id="maintenanceScheduleVehicleFilter" aria-label="Filter schedules by vehicle"></select></label>
+                <button class="schedule-filter active" type="button" data-schedule-filter="all">All schedules</button>
+                <button class="schedule-filter" type="button" data-schedule-filter="due">Due soon</button>
+                <button class="schedule-filter" type="button" data-schedule-filter="overdue">Overdue</button>
+                <button class="schedule-filter" type="button" data-schedule-filter="completed">Completed</button>
+              </div>
+              <div id="maintenanceScheduleList" class="maintenance-schedule-list"></div>
+            </div>
+            <section id="maintenanceRecentHistory" class="schedule-history-section">
+              <div class="schedule-section-heading"><h3>Recently completed</h3><small>Latest completed services for your fleet</small></div>
+              <div id="maintenanceScheduleHistory" class="maintenance-schedule-history"></div>
+            </section>
+          </section>
+          <!-- Administrator-only, explainable pilot for maintenance risk and outcome tracking. -->
+          <section id="predictiveMaintenancePanel" class="panel hidden admin-only predictive-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Predictive maintenance pilot</div>
+                <div class="panel-sub">Early warnings based on vehicle history, repair costs, and service records</div>
+              </div>
+              <span class="tag neutral">Pilot estimate</span>
+            </div>
+            <div id="predictiveMaintenanceContent" class="predictive-content"></div>
+          </section>
+          <section class="panel table-panel" id="inventorySection">
+            <div class="table-top">
+              <div>
+                <div class="panel-title" id="tableTitle">Fleet inventory</div>
+                <div class="panel-sub">
+                  Vehicle profiles, service status, and recent activity
+                </div>
+              </div>
+              <div class="tools">
+                <div class="search">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m16 16 4 4" /></svg
+                  ><input
+                    id="searchInput"
+                    placeholder="Search fleet…"
+                    aria-label="Search inventory"
+                  />
+                </div>
+                <select class="filter" id="typeFilter">
+                  <option value="all">All types</option>
+                  <option value="Vehicle">Vehicles</option>
+                  <option value="Motorcycle">Motorcycles</option></select
+                ><select class="filter" id="statusFilter">
+                  <option value="all">All statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Maintenance">In maintenance</option>
+                  <option value="Disposed">Disposed</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Station</th>
+                    <th>Acquired</th>
+                    <th>Useful life</th>
+                    <th><label class="repair-period-label">Repairs <select id="repairPeriodFilter" aria-label="Repair cost period"><option value="ytd" selected>Year to date</option><option value="month">This month</option><option value="year">Past year</option><option value="all">All time</option></select></label></th>
+                    <th>Last report</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="fleetBody"></tbody>
+              </table>
+            </div>
+            <div class="table-foot">
+              <span id="recordCount"
+                >No asset records have been entered yet</span
+              ><span>Records stored in this browser</span>
+            </div>
+          </section>
+          <div
+            style="
+              margin-top: 13px;
+              color: #82918b;
+              font-size: 10px;
+              line-height: 1.5;
+            "
+          >
+            Fleet counts and reports use only records entered in the asset
+            register. Browser storage is for demonstration; deploy with
+            authenticated server storage for shared, secure, real-time access.
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="modalRoot"></div>
+    <div id="toastRoot"></div>
+    <!-- Load sign-in first; the dashboard code cannot block account selection. -->
+    <!-- Tesseract.js performs photo OCR locally in the browser after loading its OCR assets. -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+    <script src="auth.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
+
