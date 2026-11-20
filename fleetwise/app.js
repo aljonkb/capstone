@@ -1,13 +1,3 @@
-// One-time cleanup requested by the owner: clear old demo entries before loading.
-// A separate marker prevents this reset from repeating on later visits.
-try {
-  if (localStorage.getItem("fleetwise-reset-complete-v2") !== "yes") {
-    localStorage.removeItem("fleetwise-v1");
-    localStorage.setItem("fleetwise-reset-complete-v2", "yes");
-  }
-} catch (error) {
-  console.warn("Could not clear Fleetwise browser storage.", error);
-}
 const KEY = "fleetwise-v1";
 let state = load();
 if (!Array.isArray(state.stations)) state.stations = ["Central Office", "Station 01", "Station 02", "Station 03", "Station 04"];
@@ -973,6 +963,18 @@ function downloadMaintenanceReport(reportId) {
   link.remove();
   setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
 }
+// Card accent colors for the Stations tab, cycled per station.
+const STATION_TILE_COLORS = ["#e5262f", "#f0b90b", "#2d3a52", "#627eea", "#8247e5", "#14b8a6", "#f97316", "#0ea5e9"];
+// Copy a station's login username so an admin can share it.
+function copyStationLogin(index) {
+  if (role !== "admin") return;
+  const name = state.stations[index];
+  if (!name) return;
+  const text = stationLoginName(name);
+  const done = () => toast(`Copied login name: ${text}`);
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => toast("Copy failed. Login name: " + text));
+  else toast("Copy not supported here. Login name: " + text);
+}
 // Admins get an organization-wide station report; station accounts see only their feedback.
 function renderStationReports() {
   const names = [...new Set([...state.stations, ...state.vehicles.map((v) => v.station || "Unassigned")])];
@@ -1012,7 +1014,10 @@ function renderStationReports() {
     const unreadStatus = unreadReportCount || unreadMessageCount
       ? `<small class="station-unread-indicator">${unreadReportCount} unread report(s) · ${unreadMessageCount} unread message(s)</small>`
       : "";
-    return `<article class="station-report"><div class="station-report-head"><button type="button" class="station-summary-toggle" aria-label="Open ${esc(name)} details" onclick="openStationDetailsFromSummary(${detailIndex})"><span class="station-summary-copy"><b>${esc(name)}</b><small>${units.length} vehicle(s) · ${reports.length} repair report(s) · ${money(spend)} total repairs · Distance between readings: ${distanceSummary}</small>${unreadStatus}${requestStatus}</span><span class="station-detail-label">View details →</span></button>${requestButton}</div></article>`;
+    const tint = STATION_TILE_COLORS[detailIndex % STATION_TILE_COLORS.length];
+    const canDelete = stationIndex >= 0;
+    const loginLabel = canDelete ? stationLoginName(name) : "";
+    return `<article class="station-tile" style="--tile:${tint}" onclick="openStationTile(event, ${detailIndex})"><span class="station-tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M8 9h.01M12 9h.01M16 9h.01M8 12h.01M12 12h.01M16 12h.01"/></svg></span><button type="button" class="station-tile-open" aria-label="Open ${esc(name)} details" onclick="openStationDetailsFromSummary(${detailIndex})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></button><div class="station-tile-body"><span class="station-tile-label">Station</span><button type="button" class="station-tile-name" onclick="openStationDetailsFromSummary(${detailIndex})">${esc(name)}</button><small class="station-tile-stats">${units.length} vehicle(s) · ${reports.length} report(s) · ${money(spend)}</small><small class="station-tile-stats">Distance: ${distanceSummary}</small>${unreadStatus}${requestStatus}</div><div class="station-tile-foot">${requestButton}<span class="station-tile-actions">${canDelete ? `<button type="button" class="station-tile-icon-btn danger" title="Delete ${esc(name)}" aria-label="Delete ${esc(name)}" onclick="deleteStation(${stationIndex})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button type="button" class="station-tile-icon-btn" title="Copy login name (${esc(loginLabel)})" aria-label="Copy login name for ${esc(name)}" onclick="copyStationLogin(${stationIndex})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>` : ""}</span></div></article>`;
   }).join("");
   const feedbackList = document.getElementById("stationFeedbackList");
   if (feedbackList) {
@@ -1038,6 +1043,11 @@ function renderStationReports() {
   if (reportBox) reportBox.innerHTML = state.generatedReports.slice().reverse().map((r, index) => { const reportIndex = state.generatedReports.length - index - 1; return `<article class="generated-report"><div><b>${esc(r.title)}</b><small>${esc(r.createdAt)}</small></div><pre>${esc(r.body)}</pre><div class="generated-report-actions"><button class="btn secondary" onclick="downloadReport(${reportIndex})">Download .txt</button><button class="btn danger" onclick="deleteGeneratedReport(${reportIndex})">Delete report</button></div></article>`; }).join("") || '<div class="muted-note">No reports generated yet.</div>';
 }
 // Open the station detail page from a station card in the report list.
+function openStationTile(event, index) {
+  // The card opens on ordinary clicks, while its own buttons keep their separate actions.
+  if (event.target.closest("button")) return;
+  openStationDetailsFromSummary(index);
+}
 function openStationDetailsFromSummary(index) {
   if (role !== "admin") return;
   const names = [...new Set([...state.stations, ...state.vehicles.map((vehicle) => vehicle.station || "Unassigned")])];
@@ -1053,6 +1063,37 @@ function openStationDetails(name) {
   if (role !== "admin" || !name) return;
   selectedStationDetail = name;
   nav("stationDetail");
+}
+// Open a message addressed to the station on this page, like writing its name on an envelope.
+function messageSelectedStation() {
+  if (role !== "admin" || !state.stations.includes(selectedStationDetail)) return;
+  // Remember the recipient now so changing pages cannot send this draft to another station.
+  const recipient = selectedStationDetail;
+  modal(
+    "Message station",
+    "Send an administrator message to this station.",
+    `<form id="stationMessageForm" class="form"><div class="form-grid"><div class="field full"><label for="stationMessageRecipient">To</label><input id="stationMessageRecipient" value="${esc(recipient)}" readonly></div><div class="field full"><label for="stationMessageText">Message</label><textarea id="stationMessageText" rows="5" required placeholder="Write your message to this station…"></textarea></div></div><div class="form-actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button><button type="submit" class="btn primary">Send message</button></div></form>`,
+  );
+  const messageInput = document.getElementById("stationMessageText");
+  messageInput.addEventListener("input", () => messageInput.setCustomValidity(""));
+  document.getElementById("stationMessageForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (role !== "admin") return;
+    if (!state.stations.includes(recipient)) return toast("This station is no longer available.");
+    const message = messageInput.value.trim();
+    if (!message) {
+      messageInput.setCustomValidity("Write a message before sending.");
+      messageInput.reportValidity();
+      return;
+    }
+    // Use the same message box as station feedback, so notifications and unread marks work too.
+    const createdAt = new Date().toISOString();
+    state.feedback.push({ id: crypto.randomUUID(), station: recipient, message, date: createdAt.slice(0, 10), createdAt, readAt: null, adminSeenAt: null });
+    save();
+    closeModal();
+    toast(`Message sent to ${recipient}.`);
+  });
+  messageInput.focus();
 }
 // Render only the selected station's fleet and repair history in its separate page.
 function renderSelectedStationDetails() {
@@ -1106,7 +1147,8 @@ function renderSelectedStationDetails() {
       ? formatDistance(stats.traveled)
       : stats.readingCount === 1 ? "Needs another reading" : "Not recorded";
     return `<article class="station-detail-vehicle">
-      <div class="station-detail-vehicle-head"><div><b>${esc(vehicle.name || vehicle.plate || "Vehicle")}</b><small>${esc(vehicle.plate || "No plate")} · ${esc(vehicle.make || "")} ${esc(vehicle.model || "")}</small></div><span class="tag ${vehicle.status === "Disposed" ? "neutral" : vehicle.status === "Maintenance" ? "warn" : "good"}">${esc(vehicle.status || "Active")}</span></div>
+      <div class="station-detail-vehicle-top"><span class="station-detail-vehicle-icon" aria-hidden="true">${vehicle.type === "Motorcycle" ? "🏍️" : "🚙"}</span><span class="tag ${vehicle.status === "Disposed" ? "neutral" : vehicle.status === "Maintenance" ? "warn" : "good"}">${esc(vehicle.status || "Active")}</span></div>
+      <div class="station-detail-vehicle-heading"><b>${esc(vehicle.name || vehicle.plate || "Vehicle")}</b><small>${esc(vehicle.plate || "No plate")} · ${esc(vehicle.make || "")} ${esc(vehicle.model || "")}</small></div>
       <div class="station-detail-facts"><span><small>Type</small><b>${esc(vehicle.type || "Vehicle")}</b></span><span><small>Acquired</small><b>${vehicle.acquired ? esc(new Date(vehicle.acquired + "T00:00:00").toLocaleDateString("en-PH", { month: "short", year: "numeric" })) : "—"}</b></span><span><small>Useful life</small><b>${esc(vehicle.usefulLife || "—")} ${vehicle.usefulLife ? "years" : ""}</b></span><span><small>Repairs this year</small><b>${money(yrSpend(vehicle.id))}</b></span><span><small>Latest odometer</small><b>${esc(latest)}</b></span><span><small>Distance between readings</small><b>${esc(traveled)}</b></span></div>
     </article>`;
   }).join("") : '<div class="empty">No vehicles are assigned to this station.</div>';
@@ -1130,9 +1172,10 @@ function renderSelectedStationDetails() {
   const stationIndex = state.stations.indexOf(selectedStationDetail);
   const hasActiveVehicle = units.some((vehicle) => vehicle.status !== "Disposed");
   const pendingRequest = state.reportRequests.some((request) => request.station === selectedStationDetail && request.status === "pending");
-  requestAction.innerHTML = stationIndex < 0 ? "" : pendingRequest
+  const requestButton = pendingRequest
     ? '<button class="btn secondary" disabled>Request pending</button>'
     : `<button class="btn secondary" onclick="requestStationReport(${stationIndex})" ${hasActiveVehicle ? "" : "disabled title=\"Assign an active vehicle before requesting a report\""}>Request report</button>`;
+  requestAction.innerHTML = stationIndex < 0 ? "" : `${requestButton}<button type="button" class="btn primary" onclick="messageSelectedStation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9H13a8.5 8.5 0 0 1 8 8v.5Z"/></svg>Message station</button>`;
 }
 // Show new reports and admin messages that their station has not read yet.
 function renderAdminNotifications() {
@@ -1467,7 +1510,7 @@ function showDetail(id) {
   modal(
     esc(v.name || v.make + " " + v.model),
     `${esc(v.plate || "No plate")} · ${esc(v.type)} · ${esc(v.station || "No station assigned")}`,
-    `<div class="form"><div class="detail-cards"><div class="detail-card"><small>Acquisition</small><b>${esc(v.acquisition || "—")}</b></div><div class="detail-card"><small>Useful life</small><b>${v.usefulLife || "—"} years</b></div><div class="detail-card"><small>Repairs this year</small><b>${money(yrSpend(id))}</b></div></div><div style="font-size:11px;color:#71817d;margin-bottom:15px">Acquired ${v.acquired || "date not set"} · Estimated replacement ${v.replacementCost ? money(v.replacementCost) : "not set"} · ${esc(v.notes || "No acquisition notes")}</div><div class="history"><h3>Repair history (${rr.length})</h3>${rr.length ? rr.map((r) => `<div class="history-item"><div><b>${esc(r.category || "Repair")}: ${esc(r.description)}</b><small>${esc(r.date)} · ${esc(r.odometer || "—")} km · ${esc(r.funding || "Funding not recorded")} · ${esc(r.days || 0)} days out</small></div><b>${money(r.cost)}</b></div>`).join("") : '<div class="empty" style="padding:15px">No repair entries yet.</div>'}</div><div class="form-actions" style="justify-content:space-between"><button class="btn secondary" onclick="addRepair('${escId(id)}')">＋ Create maintenance report</button><div style="display:flex;gap:8px"><button class="btn secondary admin-only" onclick="editAsset('${escId(id)}')">Edit profile</button><button class="btn danger admin-only" onclick="deleteAsset('${escId(id)}')">Delete asset</button>${v.status !== "Disposed" ? `<button class="btn danger admin-only" onclick="disposeAsset('${escId(id)}')">Record disposal</button>` : ""}</div></div></div>`,
+    `<div class="form"><div class="detail-cards"><div class="detail-card"><small>Acquisition</small><b>${esc(v.acquisition || "—")}</b></div><div class="detail-card"><small>Useful life</small><b>${v.usefulLife || "—"} years</b></div><div class="detail-card"><small>Repairs this year</small><b>${money(yrSpend(id))}</b></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:15px">Acquired ${v.acquired || "date not set"} · Estimated replacement ${v.replacementCost ? money(v.replacementCost) : "not set"} · ${esc(v.notes || "No acquisition notes")}</div><div class="history"><h3>Repair history (${rr.length})</h3>${rr.length ? rr.map((r) => `<div class="history-item"><div><b>${esc(r.category || "Repair")}: ${esc(r.description)}</b><small>${esc(r.date)} · ${esc(r.odometer || "—")} km · ${esc(r.funding || "Funding not recorded")} · ${esc(r.days || 0)} days out</small></div><b>${money(r.cost)}</b></div>`).join("") : '<div class="empty" style="padding:15px">No repair entries yet.</div>'}</div><div class="form-actions" style="justify-content:space-between"><button class="btn secondary" onclick="addRepair('${escId(id)}')">＋ Create maintenance report</button><div style="display:flex;gap:8px"><button class="btn secondary admin-only" onclick="editAsset('${escId(id)}')">Edit profile</button><button class="btn danger admin-only" onclick="deleteAsset('${escId(id)}')">Delete asset</button>${v.status !== "Disposed" ? `<button class="btn danger admin-only" onclick="disposeAsset('${escId(id)}')">Record disposal</button>` : ""}</div></div></div>`,
   );
   applyRole();
 }
@@ -1655,11 +1698,21 @@ document.addEventListener("keydown", (event) => {
 });
 document.getElementById("settingsBtn").onclick = () => {
   setProfileMenuOpen(false);
+  // Everyone can choose colors. Fleet warning information stays with the administrator.
+  const fleetSettings = role === "admin" ? `<section class="settings-thresholds"><h3>Replacement warnings</h3><div class="form-note">These default warning thresholds are applied to the records stored in this browser.</div><div class="detail-cards"><div class="detail-card"><small>Repair spend warning</small><b>75% of new cost</b></div><div class="detail-card"><small>High risk</small><b>100% of new cost</b></div><div class="detail-card"><small>Life warning</small><b>1 year remaining</b></div></div><p class="settings-note">For shared use, secure authentication, role permissions, and synchronized storage must be provided by a backend deployment.</p></section>` : "";
   modal(
-    "Fleet settings",
-    "Thresholds used to flag vehicle replacement needs.",
-    `<div class="form"><div class="form-note">These default warning thresholds are applied to the records stored in this browser.</div><div class="detail-cards"><div class="detail-card"><small>Repair spend warning</small><b>75% of new cost</b></div><div class="detail-card"><small>High risk</small><b>100% of new cost</b></div><div class="detail-card"><small>Life warning</small><b>1 year remaining</b></div></div><p style="font-size:11px;color:#71817d;line-height:1.6">For shared use, secure authentication, role permissions, and synchronized storage must be provided by a backend deployment.</p><div class="form-actions"><button class="btn primary" onclick="closeModal()">Done</button></div></div>`,
+    "Settings",
+    "Make your Fleetwise workspace comfortable to use.",
+    `<div class="form"><section class="appearance-settings" aria-labelledby="appearanceTitle"><h3 id="appearanceTitle">Appearance</h3><p>Choose the colors for your workspace and login page.</p><div class="field"><label for="appearanceTheme">Color mode</label><select id="appearanceTheme" aria-describedby="appearanceStatus"><option value="light">Light mode</option><option value="dark">Dark mode</option></select></div><p id="appearanceStatus" class="appearance-status" role="status">Changes apply immediately and are remembered in this browser.</p></section>${fleetSettings}<div class="form-actions"><button class="btn primary" onclick="closeModal()">Done</button></div></div>`,
   );
+  const themeSelector = document.getElementById("appearanceTheme");
+  themeSelector.value = window.FleetwiseTheme.get();
+  themeSelector.addEventListener("change", () => {
+    const saved = window.FleetwiseTheme.set(themeSelector.value);
+    document.getElementById("appearanceStatus").textContent = saved
+      ? `${themeSelector.value === "dark" ? "Dark" : "Light"} mode saved for this browser.`
+      : "Mode changed for this visit. Your browser could not save the preference.";
+  });
 };
 document.getElementById("feedbackForm").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -1688,4 +1741,3 @@ document.getElementById("makeMonthlyReport").addEventListener("click", () => gen
 document.getElementById("makeStationReport").addEventListener("click", () => generateReport("station"));
 applyRole();
 render();
-

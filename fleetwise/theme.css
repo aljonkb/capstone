@@ -1,0 +1,205 @@
+/* These settings styles use the page's colors, so they work in either mode. */
+:root {
+  color-scheme: light;
+}
+.appearance-settings {
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+.appearance-settings h3,
+.settings-thresholds h3 {
+  margin: 0 0 8px;
+  font: 700 13px Manrope, sans-serif;
+}
+.appearance-settings p,
+.settings-note {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.appearance-settings .field label {
+  color: var(--ink);
+}
+.appearance-settings select {
+  min-height: 42px;
+  font-size: 12px;
+}
+.appearance-settings .appearance-status {
+  margin: 10px 0 0;
+  min-height: 1.6em;
+}
+
+/* Think of these as the paint pots used throughout dark mode. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e6edf7;
+  --muted: #a6b6cc;
+  --line: #35465e;
+  --paper: #0d1726;
+  --white: #17263c;
+  --surface: #17263c;
+  --surface-soft: #20334d;
+  --input: #101c2e;
+  --green: #93c5fd;
+  --green2: #243f5d;
+  --amber: #f6c568;
+  --amberbg: #40331e;
+  --red: #ffaaa3;
+  --redbg: #432a32;
+  --success: #91dbb7;
+  --successbg: #1d3c36;
+  --nav: #10213c;
+  --shadow: 0 8px 28px #00000030;
+}
+
+/* Main cards, menus, and dialogs share the same dark surface. */
+:root[data-theme="dark"] :is(
+  .topbar, .metric, .panel, .modal, .profile-menu-panel, .profile-menu-toggle,
+  .btn.secondary, .icon-btn, .logout-btn, .station-filter, .schedule-filter,
+  .station-manager-row, .station-detail-vehicle, .station-tile,
+  .maintenance-schedule-card, .prediction-card, .prediction-metrics > div,
+  .login-screen
+) {
+  background: var(--surface);
+  color: var(--ink);
+}
+:root[data-theme="dark"] #stationsPanel {
+  background: transparent;
+}
+:root[data-theme="dark"] #stationsPanel :is(.station-manager, .feedback-compose, .report-builder) {
+  background: var(--surface);
+}
+
+/* Softer panels help separate facts and instructions from the page behind them. */
+:root[data-theme="dark"] :is(
+  .detail-card, .schedule-completion-details > div, .maintenance-schedule-facts > div,
+  .station-detail-facts > span, .feedback-compose, .station-manager, .schedule-create,
+  .generated-report pre, .repair-detail-photo, .station-vehicle, .session-name,
+  .login-tabs, .login-hint, .form-note, .tag.neutral, .schedule-status.missing
+) {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] :is(th, .progress, .prediction-meter) {
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+:root[data-theme="dark"] :is(td, .alert-row) {
+  border-color: var(--line);
+}
+:root[data-theme="dark"] :is(tbody tr:hover, .station-car-card:hover, .profile-menu-item:hover,
+  .profile-menu-toggle:hover, .profile-menu-toggle[aria-expanded="true"],
+  .station-tile-open:hover, .station-tile-icon-btn:hover,
+  .station-tile-open:focus-visible, .station-tile-icon-btn:focus-visible) {
+  background: var(--surface-soft);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+/* Form fields and the browser's built-in dropdowns follow the chosen mode too. */
+:root[data-theme="dark"] :is(input, select, textarea) {
+  background: var(--input);
+  color: var(--ink);
+  border-color: var(--line);
+}
+:root[data-theme="dark"] :is(input, textarea)::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+:root[data-theme="dark"] :is(input, select, textarea):focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px #93c5fd30;
+}
+:root[data-theme="dark"] :is(button, a):focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
+:root[data-theme="dark"] :is(.field label, .login-fields label, .login-tab,
+  .close, .row-btn, .search svg, .station-tile-label, .station-tile-open,
+  .station-tile-icon-btn, .profile-menu-item svg) {
+  color: var(--muted);
+}
+:root[data-theme="dark"] :is(.small-link, .eyebrow, .station-detail-label,
+  .station-tile-name:hover, .station-manager-name:hover b,
+  .station-summary-toggle:hover .station-summary-copy > b) {
+  color: var(--green);
+}
+:root[data-theme="dark"] :is(.metric-icon, .unit-icon, .avatar,
+  .brandmark, .station-detail-vehicle-icon) {
+  background: var(--green2);
+  color: #aad5ff;
+}
+:root[data-theme="dark"] :is(.station-filter.active, .schedule-filter.active,
+  .login-tab.active, .notification-item.unread, .station-request-card,
+  .prediction-disclaimer, .schedule-status.upcoming) {
+  background: var(--green2);
+  color: #c0defe;
+  border-color: #50779e;
+}
+
+/* Warning, error, and success labels keep their meaning with brighter text. */
+:root[data-theme="dark"] :is(.schedule-status.overdue, .schedule-unread-badge,
+  .prediction-risk.high, .station-car-status.overdue) {
+  background: var(--redbg);
+  color: var(--red);
+  border-color: #805259;
+}
+:root[data-theme="dark"] :is(.schedule-status.due, .schedule-status.due-soon,
+  .prediction-risk.watch, .prediction-data-warning, .prediction-duplicate-notice,
+  .prediction-duplicate-tag, .overdue-notice, .station-car-status.repair) {
+  background: var(--amberbg);
+  color: var(--amber);
+  border-color: #826841;
+}
+:root[data-theme="dark"] :is(.tag.good, .schedule-status.completed,
+  .prediction-risk.routine, .overdue-notice.ok) {
+  background: var(--successbg);
+  color: var(--success);
+  border-color: #417b65;
+}
+:root[data-theme="dark"] :is(.request-state.pending, .prediction-pending,
+  .prediction-outcome.issue-found) {
+  color: var(--amber);
+}
+:root[data-theme="dark"] :is(.request-state.complete, .prediction-outcome, .live) {
+  color: var(--success);
+}
+:root[data-theme="dark"] .prediction-outcome.issue-found {
+  color: var(--amber);
+}
+:root[data-theme="dark"] :is(.login-error, .profile-menu-item.signout-item,
+  .profile-menu-item.signout-item svg, .station-tile-icon-btn.danger:hover) {
+  color: var(--red);
+}
+:root[data-theme="dark"] .station-unread-indicator {
+  color: var(--red) !important;
+}
+:root[data-theme="dark"] .ocr-filled {
+  background: var(--successbg) !important;
+  border-color: var(--success) !important;
+}
+
+/* Keep the station colors, but blend their decorations into dark cards. */
+:root[data-theme="dark"] .station-tile::before {
+  background: radial-gradient(130% 95% at 0% 0%,
+    color-mix(in srgb, var(--tile) 22%, var(--surface)) 0%, var(--surface) 75%);
+}
+:root[data-theme="dark"] .station-detail-vehicle {
+  background: linear-gradient(150deg, var(--surface-soft), var(--surface) 60%);
+}
+:root[data-theme="dark"] .login-brand {
+  background: linear-gradient(145deg, #10213c, #193d63);
+}
+:root[data-theme="dark"] .modal-bg {
+  background: #030a16b3;
+}
+:root[data-theme="dark"] .toast {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}

@@ -1420,6 +1420,35 @@ textarea:focus {
 .admin-notification-item{padding:15px 2px;border-bottom:1px solid var(--line)}.admin-notification-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.admin-notification-head b{font-size:12px}.admin-notification-head small{display:block;margin-top:4px;color:var(--muted);font-size:10px}.admin-notification-detail{margin:10px 0}.admin-notification-detail b{font-size:11px}.admin-notification-detail p{margin:5px 0;color:var(--muted);font-size:11px;white-space:pre-wrap}.admin-notification-item>.btn{padding:7px 10px;font-size:10px}.station-unread-indicator{color:#ae473c!important;font-weight:700}.station-detail-message{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:12px 2px;border-top:1px solid var(--line)}.station-detail-message b{font-size:11px}.station-detail-message small{display:block;margin-top:4px;color:var(--muted);font-size:10px}.station-detail-message p{grid-column:1/-1;margin:3px 0 0;font-size:12px;white-space:pre-wrap}.station-detail-report .tag{display:inline-block;margin-top:6px;font-size:9px}
 .station-detail-facts{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}@media(max-width:700px){.station-detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+/* Give every vehicle at a station its own compact dashboard-style tile. */
+#stationDetailsVehicles{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));
+  align-items:stretch;
+  gap:16px;
+}
+.station-detail-vehicle{
+  display:flex;
+  flex-direction:column;
+  min-height:310px;
+  margin:0;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(150deg,#f0f6fd 0%,#fff 55%);
+  box-shadow:0 8px 22px #173b3210;
+}
+.station-detail-vehicle-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.station-detail-vehicle-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:17px;background:#e8f1fb;color:var(--green);font-size:29px}
+.station-detail-vehicle-heading{display:grid;gap:4px;margin-top:13px}
+.station-detail-vehicle-heading b{color:var(--ink);font:700 14px Manrope,sans-serif;overflow-wrap:anywhere}
+.station-detail-vehicle-heading small{color:var(--muted);font-size:10px;line-height:1.45}
+.station-detail-facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:auto;padding-top:15px;border:0}
+.station-detail-facts>span{min-width:0;padding:9px;border:1px solid #e7eef6;border-radius:8px;background:#ffffffd9}
+.station-detail-facts small{line-height:1.35}
+.station-detail-facts b{overflow-wrap:anywhere}
+@media(max-width:700px){#stationDetailsVehicles{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}.station-detail-vehicle{min-height:0}}
+
 /* Let each admin station section sit in its own dashboard-style card. */
 #stationsPanel{
   overflow:visible;
@@ -1535,8 +1564,8 @@ textarea:focus {
 .schedule-status.upcoming{border-color:#c9dcf3;background:#f0f6fd;color:#355b84}
 .schedule-status.missing{border-color:#d9e0e7;background:#f2f4f6;color:#667583}
 .schedule-status.completed{border-color:#cce5d7;background:#eaf4ef;color:#2f6a4e}
-.maintenance-schedule-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
-.maintenance-schedule-facts>div{min-width:0}
+.maintenance-schedule-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px;margin-top:14px;padding-top:0;border-top:0}
+.maintenance-schedule-facts>div{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#f8fbff}
 .maintenance-schedule-facts>div>small:first-child{margin-top:0}
 .maintenance-schedule-facts b{display:block;margin-top:4px;color:var(--ink);font-size:11px}
 .maintenance-schedule-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
@@ -1868,4 +1897,62 @@ textarea:focus {
     padding: 3px 6px 3px 3px;
   }
 }
+/* Stations tab: card grid with tinted corner, round icon, arrow and copy actions. */
+#stationsPanel #stationManagerList{display:none}
+#stationsPanel #stationReportList{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;
+  padding:4px 2px 8px;border:0;border-radius:0;background:transparent;box-shadow:none;
+}
+.station-tile{
+  --tile:#627eea;position:relative;display:flex;flex-direction:column;min-height:210px;
+  padding:100px 18px 14px;border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;
+  box-shadow:0 10px 30px #1a2a4414;transition:transform .18s ease,box-shadow .18s ease;
+}
+.station-tile:hover{transform:translateY(-2px);box-shadow:0 14px 34px #1a2a441c}
+.station-tile::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(130% 95% at 0% 0%,color-mix(in srgb,var(--tile) 26%,#fff) 0%,color-mix(in srgb,var(--tile) 8%,#fff) 45%,#fff 75%);
+}
+.station-tile>*{position:relative}
+.station-tile-icon{
+  position:absolute;top:14px;left:14px;display:grid;place-items:center;width:76px;height:76px;
+  border-radius:50%;background:var(--tile);color:#fff;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--tile) 35%,transparent);
+}
+.station-tile-icon svg{width:36px;height:36px}
+.station-tile-open{
+  position:absolute;top:14px;right:14px;display:grid;place-items:center;width:30px;height:30px;
+  border:0;border-radius:8px;background:transparent;color:#6d7d91;cursor:pointer;
+}
+.station-tile-open:hover,.station-tile-open:focus-visible{background:#fff;color:var(--ink)}
+.station-tile-open svg{width:17px;height:17px}
+.station-tile-body{display:grid;gap:4px;align-content:start;flex:1}
+.station-tile-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#8a96a6;font-weight:500}
+.station-tile-name{
+  justify-self:start;padding:0;border:0;background:transparent;color:var(--ink);
+  font:700 15px Manrope,sans-serif;text-align:left;cursor:pointer;
+}
+.station-tile-name:hover{color:#2367ad}
+.station-tile-stats{display:block;color:var(--muted);font-size:10.5px;line-height:1.5}
+.station-tile .request-state{margin-top:2px}
+.station-tile-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;min-height:32px}
+.station-tile-foot .btn{padding:6px 10px;font-size:10.5px}
+.station-tile-actions{display:flex;gap:2px;margin-left:auto}
+.station-tile-icon-btn{
+  display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:8px;
+  background:transparent;color:#7b8798;cursor:pointer;
+}
+.station-tile-icon-btn:hover,.station-tile-icon-btn:focus-visible{background:#fff;color:var(--ink)}
+.station-tile-icon-btn.danger:hover,.station-tile-icon-btn.danger:focus-visible{color:var(--red)}
+.station-tile-icon-btn svg{width:16px;height:16px}
+.station-tile :focus-visible{outline:2px solid #2367ad;outline-offset:2px}
+@media(max-width:600px){#stationsPanel #stationReportList{grid-template-columns:1fr}}
 
+/* Keep the station's report and message buttons together, with room between them. */
+.station-details-header #stationDetailsRequestAction {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}

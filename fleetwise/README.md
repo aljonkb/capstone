@@ -1,6 +1,8 @@
 # Fleetwise fleet management prototype
 
-Open index.html in a modern browser. Keep index.html, styles.css, auth.js, and app.js in the same folder. No build step or server is required.
+Open index.html in a modern browser. Keep index.html, styles.css, theme.css, theme.js, auth.js, app.js, and reset-local-demo.js in the same folder. No build step or server is required.
+
+Open your profile menu, choose **Settings**, then select **Light mode** or **Dark mode** under **Appearance**. Both administrator and station accounts can change the mode. It updates the workspace and login page immediately and remembers the choice in this browser, separately from fleet records.
 
 ## Demo sign-in
 
@@ -35,7 +37,7 @@ The station menu separates **My vehicles**, **Create report**, and **Report hist
 
 ## Understanding the source
 
-The source files are separated by purpose: index.html contains the page structure and form fields, styles.css controls colors and layout, auth.js handles sign-in, and app.js handles fleet records and dashboard updates. Comments mark the main sections and explain the key functions.
+The source files are separated by purpose: index.html contains the page structure and form fields, styles.css controls colors and layout, theme.css adds dark colors and appearance settings, theme.js remembers and applies the selected mode before the page is drawn, auth.js handles sign-in, and app.js handles fleet records and dashboard updates. Comments mark the main sections and explain the key functions.
 
 ## Production deployment
 

@@ -2,7 +2,7 @@
 
 Base path: `/api/v1`. JSON uses ISO 8601 timestamps and ISO `YYYY-MM-DD` dates. UUIDs are opaque IDs. The browser must never send a trusted `organization_id`, role, or station assignment; the API derives those from the authenticated user.
 
-## Kid-friendly guide
+## friendly guide
 
 Think of the website as a person at a front desk and the API as the locked door to the records room. The website asks the API to do something; the API checks who is asking, then reads or changes the database. A station user gets only that station's records, while an administrator can see their whole organization.
 

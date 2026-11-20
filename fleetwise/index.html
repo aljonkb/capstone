@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#123b70" />
     <title>Fleetwise | Fleet management</title>
-    
-    
-    
-  <link rel="stylesheet" href="styles.css"></head>
+    <!-- Pick the saved colors before drawing the page, so dark mode does not flash white. -->
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="theme.css" />
+  </head>
   <body>
     <!-- Login screen: the app stays hidden until a demo account is accepted. -->
     <section id="loginScreen" class="login-screen">
@@ -185,7 +186,7 @@
               </svg>
             </button>
             <div class="profile-menu-panel" id="profileMenuPanel" role="menu" hidden>
-              <button class="profile-menu-item admin-only" id="settingsBtn" type="button" role="menuitem">
+              <button class="profile-menu-item" id="settingsBtn" type="button" role="menuitem">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                   <circle cx="12" cy="12" r="3" />
                   <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.6-1.4-2.4L5.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.7-1L9 7.3h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.6 1.4 2.4-1.4 1.1a8 8 0 0 1-.1 2z" transform="translate(0 -1)" />
@@ -292,7 +293,7 @@
                 Replacement watchlist
                 <span
                   class="metric-icon"
-                  style="background: #fff3df; color: #a45b0a"
+                  style="background: var(--amberbg); color: var(--amber)"
                   ><svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -528,7 +529,7 @@
           <div
             style="
               margin-top: 13px;
-              color: #82918b;
+              color: var(--muted);
               font-size: 10px;
               line-height: 1.5;
             "
@@ -542,6 +543,8 @@
     </div>
     <div id="modalRoot"></div>
     <div id="toastRoot"></div>
+    <!-- Clear the requested local demo records once, before either script loads them. -->
+    <script src="reset-local-demo.js"></script>
     <!-- Load sign-in first; the dashboard code cannot block account selection. -->
     <!-- Tesseract.js performs photo OCR locally in the browser after loading its OCR assets. -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>

@@ -1,4 +1,4 @@
--- Fleetwise PostgreSQL schema (first design version).
+-- Fleetwise PostgreSQL schema
 -- Kid version: this file is the blueprint for the database's filing cabinets and folders.
 -- Apply it to a new test database first. Never experiment directly on a live client database.
 -- How to read this file: CREATE TABLE makes a new filing cabinet; each column is a labeled space;

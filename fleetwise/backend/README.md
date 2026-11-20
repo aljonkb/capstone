@@ -1,12 +1,12 @@
 # Fleetwise backend and database design
 
-This folder contains the proposed shared backend design for Fleetwise. The current app is a browser-only prototype: its demo login and local browser storage are not secure and do not synchronize stations. These files define the next step; they do not connect or migrate the existing front end yet.
+This folder contains the first backend starter for Fleetwise plus the proposed shared backend design. The Express server has a basic health route and a PostgreSQL connection check. It does not yet provide fleet API endpoints, secure sign-in, or a connection from the existing front end. The current app still uses demo login and browser storage.
 
-## The kid version
+## The easy version
 
 Imagine every station keeps its records in its own labeled folder inside one locked filing cabinet. The database is the cabinet. The backend is the trusted librarian: it checks who you are, opens only the folders you are allowed to see, and writes down changes. The web page is the screen people use to ask the librarian for help.
 
-This design describes that cabinet and librarian, but they have not been built or connected yet. Right now, the prototype still saves information in the browser on one device.
+The server and database connection are the first pieces of that cabinet and librarian. Right now, the prototype still saves fleet information in the browser on one device.
 
 ## Proposed stack
 
@@ -18,8 +18,21 @@ This design describes that cabinet and librarian, but they have not been built o
 
 ## Files
 
+- [`server.js`](server.js) starts the Express server and exposes server and database health checks.
+- [`db.js`](db.js) loads local database settings and manages PostgreSQL connections.
+- [`.env.example`](.env.example) is a safe sample of the settings needed for a local PostgreSQL connection. Copy it to `.env` and put your own database password there; never share `.env`.
 - [`schema.sql`](schema.sql) is the initial PostgreSQL schema for multiple client organizations, stations, users, assets, repairs, service templates, recurring schedules, completion reports, feedback, forecasts, notifications, and audit history.
 - [`API_DESIGN.md`](API_DESIGN.md) describes the REST API, role rules, and schedule generation flow.
+
+## Connect to a local development database
+
+1. In pgAdmin, create a database named `fleetwise` with the `postgres` user as its owner.
+2. In PowerShell at the project root, run `Copy-Item backend/.env.example backend/.env`.
+3. Open `backend/.env` and replace the example `DB_PASSWORD` with the password chosen when PostgreSQL was installed. Keep this file private; the root `.gitignore` excludes it.
+4. Start the server from the project root with `npm.cmd run start:backend`.
+5. Open `http://localhost:3000/api/health/database`. A successful connection returns `database: "connected"`.
+
+The database health check uses PostgreSQL's `SELECT NOW()` command. It only proves the connection works; it does not create the Fleetwise tables. Apply `schema.sql` to a new development database in a later step.
 
 ## Data ownership and access
 

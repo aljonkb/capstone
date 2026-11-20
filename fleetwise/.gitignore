@@ -1,0 +1,10 @@
+# Installed packages can be restored from package-lock.json.
+node_modules/
+
+# Keep private settings and passwords out of shared source code.
+.env
+.env.*
+!.env.example
+
+# Ignore npm diagnostic logs.
+npm-debug.log*
